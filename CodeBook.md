@@ -102,43 +102,43 @@ library(dplyr)
 library(data.table)
 library(tidyr)
 
-##Read the above files and create data tables.
+####Read the above files and create data tables.
 
 filesPath <- "E:/study/Coursera/Data Science Specialization/Getting_and_Cleaning_Data/data/UCI HAR Dataset"
-# Read subject files
+#### Read subject files
 dataSubjectTrain <- tbl_df(read.table(file.path(filesPath, "train", "subject_train.txt")))
 dataSubjectTest  <- tbl_df(read.table(file.path(filesPath, "test" , "subject_test.txt" )))
 
-# Read activity files
+#### Read activity files
 dataActivityTrain <- tbl_df(read.table(file.path(filesPath, "train", "Y_train.txt")))
 dataActivityTest  <- tbl_df(read.table(file.path(filesPath, "test" , "Y_test.txt" )))
 
-#Read data files.
+####Read data files.
 dataTrain <- tbl_df(read.table(file.path(filesPath, "train", "X_train.txt" )))
 dataTest  <- tbl_df(read.table(file.path(filesPath, "test" , "X_test.txt" )))
 
-##1. Merges the training and the test sets to create one data set.
-# for both Activity and Subject files this will merge the training 
-# and the test sets by row binding 
-#and rename variables "subject" and "activityNum"
+####1. Merges the training and the test sets to create one data set.
+#### for both Activity and Subject files this will merge the training 
+#### and the test sets by row binding 
+####and rename variables "subject" and "activityNum"
 alldataSubject <- rbind(dataSubjectTrain, dataSubjectTest)
 setnames(alldataSubject, "V1", "subject")
 alldataActivity<- rbind(dataActivityTrain, dataActivityTest)
 setnames(alldataActivity, "V1", "activityNum")
 
-#combine the DATA training and test files
+#####combine the DATA training and test files
 dataTable <- rbind(dataTrain, dataTest)
 
-# name variables according to feature e.g.(V1 = "tBodyAcc-mean()-X")
+##### name variables according to feature e.g.(V1 = "tBodyAcc-mean()-X")
 dataFeatures <- tbl_df(read.table(file.path(filesPath, "features.txt")))
 setnames(dataFeatures, names(dataFeatures), c("featureNum", "featureName"))
 colnames(dataTable) <- dataFeatures$featureName
 
-#column names for activity labels
+#####column names for activity labels
 activityLabels<- tbl_df(read.table(file.path(filesPath, "activity_labels.txt")))
 setnames(activityLabels, names(activityLabels), c("activityNum","activityName"))
 
-# Merge columns
+##### Merge columns
 alldataSubjAct<- cbind(alldataSubject, alldataActivity)
 dataTable <- cbind(alldataSubjAct, dataTable)
 
@@ -147,7 +147,7 @@ dataTable <- cbind(alldataSubjAct, dataTable)
 dataFeaturesMeanStd <- grep("mean\\(\\)|std\\(\\)",dataFeatures$featureName,value=TRUE) 
 #var name
 
-# Taking only measurements for the mean and standard deviation and add "subject","activityNum"
+##### Taking only measurements for the mean and standard deviation and add "subject","activityNum"
 
 dataFeaturesMeanStd <- union(c("subject","activityNum"), dataFeaturesMeanStd)
 dataTable<- subset(dataTable,select=dataFeaturesMeanStd) 
@@ -157,23 +157,23 @@ dataTable<- subset(dataTable,select=dataFeaturesMeanStd)
 dataTable <- merge(activityLabels, dataTable , by="activityNum", all.x=TRUE)
 dataTable$activityName <- as.character(dataTable$activityName)
 
-## create dataTable with variable means sorted by subject and Activity
+##### create dataTable with variable means sorted by subject and Activity
 dataTable$activityName <- as.character(dataTable$activityName)
 dataAggr<- aggregate(. ~ subject - activityName, data = dataTable, mean) 
 dataTable<- tbl_df(arrange(dataAggr,subject,activityName))
 
 # 4. Appropriately labels the data set with descriptive variable names.
-# leading t or f is based on time or frequency measurements.
-# Body = related to body movement.
-# Gravity = acceleration of gravity
-# Acc = accelerometer measurement
-# Gyro = gyroscopic measurements
-# Jerk = sudden movement acceleration
-# Mag = magnitude of movement
+##### leading t or f is based on time or frequency measurements.
+##### Body = related to body movement.
+##### Gravity = acceleration of gravity
+##### Acc = accelerometer measurement
+##### Gyro = gyroscopic measurements
+##### Jerk = sudden movement acceleration
+##### Mag = magnitude of movement
 
-# mean and SD are calculated for each subject for each activity for each mean 
-#and SD measurements. The units given are g’s for the accelerometer and rad/sec 
-#for the gyro and g/sec and rad/sec/sec for the corresponding jerks.
+##### mean and SD are calculated for each subject for each activity for each mean 
+##### and SD measurements. The units given are g’s for the accelerometer and rad/sec 
+##### for the gyro and g/sec and rad/sec/sec for the corresponding jerks.
 
 names(dataTable)<-gsub("std()", "SD", names(dataTable))
 names(dataTable)<-gsub("mean()", "MEAN", names(dataTable))
