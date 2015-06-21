@@ -142,18 +142,18 @@ setnames(activityLabels, names(activityLabels), c("activityNum","activityName"))
 alldataSubjAct<- cbind(alldataSubject, alldataActivity)
 dataTable <- cbind(alldataSubjAct, dataTable)
 
-##2. Extracts only the measurements on the mean and standard deviation for each measurement.
-# Reading "features.txt" and extracting only the mean and standard deviation
+####2. Extracts only the measurements on the mean and standard deviation for each measurement.
+#### Reading "features.txt" and extracting only the mean and standard deviation
 dataFeaturesMeanStd <- grep("mean\\(\\)|std\\(\\)",dataFeatures$featureName,value=TRUE) 
-#var name
+####var name
 
 ##### Taking only measurements for the mean and standard deviation and add "subject","activityNum"
 
 dataFeaturesMeanStd <- union(c("subject","activityNum"), dataFeaturesMeanStd)
 dataTable<- subset(dataTable,select=dataFeaturesMeanStd) 
 
-##3. Uses descriptive activity names to name the activities in the data set
-##enter name of activity into dataTable
+####3. Uses descriptive activity names to name the activities in the data set
+####enter name of activity into dataTable
 dataTable <- merge(activityLabels, dataTable , by="activityNum", all.x=TRUE)
 dataTable$activityName <- as.character(dataTable$activityName)
 
@@ -162,7 +162,7 @@ dataTable$activityName <- as.character(dataTable$activityName)
 dataAggr<- aggregate(. ~ subject - activityName, data = dataTable, mean) 
 dataTable<- tbl_df(arrange(dataAggr,subject,activityName))
 
-# 4. Appropriately labels the data set with descriptive variable names.
+#### 4. Appropriately labels the data set with descriptive variable names.
 ##### leading t or f is based on time or frequency measurements.
 ##### Body = related to body movement.
 ##### Gravity = acceleration of gravity
